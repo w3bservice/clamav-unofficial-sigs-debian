@@ -1,0 +1,159 @@
+clamav-unofficial-sigs (5.1.0-1) unstable; urgency=medium
+
+  * Switch to extremeshok's new upstream repository
+  * Change debian packaging scripts
+  * Update clamav-unofficial-sigs to freshly released version 5.0.0
+
+ -- Stefan Schlesinger <sts@ono.at>  Wed, 11 Apr 2016 13:39:48 +0000
+
+clamav-unofficial-sigs (3.7.2-2) unstable; urgency=medium
+
+  * Fix bashisms in the documentation in the config (Closes: #733998)
+
+ -- Paul Wise <pabs@debian.org>  Wed, 15 Jan 2014 16:33:34 +0800
+
+clamav-unofficial-sigs (3.7.2-1) unstable; urgency=low
+
+  * New upstream release
+    * Fixes signature ignore problem (Closes: #714132)
+    * Adds configurability for curl/rsync timeouts (Closes: #693542)
+    * Adds the ability to turn off chmod calls (See: #566702)
+  * Deal with the cron job being disabled (Closes: #711161)
+  * Turn off the chmod calls by default (Closes: #566702)
+  * Switch priority to optional
+  * Bump debhelper compat level
+  * Bump Standards-Version, no changes needed
+  * Simplify the dirs file slightly
+  * Rewrite and update the copyright file to copyright-format 1.0
+  * Ignore a missing purge file
+
+ -- Paul Wise <pabs@debian.org>  Wed, 27 Nov 2013 15:38:03 +0800
+
+clamav-unofficial-sigs (3.7.1-4) unstable; urgency=low
+
+  * Point the homepage/watch at sourceforge since the domain expired.
+  * Use the canonical Vcs-* URLs
+  * Bump Standards-Version, no changes needed
+  * Suggest apt-get purge instead now that it exists
+  * Build with dh --parallel
+
+ -- Paul Wise <pabs@debian.org>  Sat, 25 May 2013 16:17:04 +0800
+
+clamav-unofficial-sigs (3.7.1-3) unstable; urgency=low
+
+  * Don't run clamdscan if it is not present
+
+ -- Paul Wise <pabs@debian.org>  Fri, 01 Jun 2012 19:27:28 +0800
+
+clamav-unofficial-sigs (3.7.1-2) unstable; urgency=low
+
+  * Package technically complies with policy 3.9.3, bump Standards-Version
+  * Wrap and sort various files
+  * Drop clamav-daemon to suggests to allow using just clamscan
+    (Closes: #672537)
+  * Revert to the upstream default of not acting as a watchdog for clamd
+  * Add a NEWS.Debian entry explaining how to re-enable the watchdog stuff
+
+ -- Paul Wise <pabs@debian.org>  Tue, 29 May 2012 20:50:22 +0800
+
+clamav-unofficial-sigs (3.7.1-1) unstable; urgency=low
+
+  * New upstream release
+    - Fixes a minor bashism in the sig creation option (Closes: #547743)
+    - Drops MSRBL signature, no updates since July 2009 (Closes: #612796)
+    - Supports new uncompressed SecuriteInfo signatures (Closes: #612795)
+  * Allow sysadmins to easily override default configs (Closes: #566620)
+  * Package technically complies with policy 3.9.1, bump Standards-Version
+
+ -- Paul Wise <pabs@debian.org>  Fri, 11 Feb 2011 18:40:36 +0800
+
+clamav-unofficial-sigs (3.6-1) unstable; urgency=low
+
+  * New upstream release
+    - Now uses dig to discover mirror IPs, depend on dnsutils
+  * In the instructions for extra security, send mail to root
+  * Bump Standards-Version, no changes needed
+  * Set the default log file permissions to clamav:adm 644 (Closes: #552351)
+  * Switch to dpkg-source 3.0 (quilt) format
+  * Switch to debhelper 7 minimal rules file
+
+ -- Paul Wise <pabs@debian.org>  Sat, 02 Jan 2010 12:27:11 +0800
+
+clamav-unofficial-sigs (3.5.4-2) unstable; urgency=low
+
+  * Brown paper bag upload
+  * Update the instructions in README.Debian to be more correct
+    and more comprehensive wrt changing file permissions
+  * Unset the right variables so that the script doesn't try
+    to chown stuff all over the joint.
+
+ -- Paul Wise <pabs@debian.org>  Wed, 22 Jul 2009 14:04:00 +0200
+
+clamav-unofficial-sigs (3.5.4-1) unstable; urgency=low
+
+  * New upstream release
+  * Document removal of mediam and high risk databases
+  * Document that some of the default settings are altered
+  * Run the script as the clamav user by default and
+    ensure correct ownership of all the files when the
+    sysadmin accepts the cron.d configuration change.
+    - Will no longer be able to start clamav when it is
+      not running, so document that and don't try to do it.
+  * Bump Standards-Version, no changes needed
+  * Switch the host dep away from the ancient host package to bind9-host
+
+ -- Paul Wise <pabs@debian.org>  Tue, 21 Jul 2009 19:02:43 +0200
+
+clamav-unofficial-sigs (3.3-2) unstable; urgency=low
+
+  * Brown paper bag upload
+  * Fix path to the script in the cron.d file
+
+ -- Paul Wise <pabs@debian.org>  Thu, 21 May 2009 15:50:43 +0800
+
+clamav-unofficial-sigs (3.3-1) unstable; urgency=low
+
+  * New upstream release
+  * Add Vcs-Git and Vcs-Browser fields
+
+ -- Paul Wise <pabs@debian.org>  Thu, 21 May 2009 13:58:02 +0800
+
+clamav-unofficial-sigs (3.1-1) unstable; urgency=low
+
+  * New upstream release
+  * Mention OITC signatures in the package description
+  * Drop the restart reload_opt options from the config, they don't work
+  * Handle the case where the upstream purge.txt does not exist yet
+  * Move the Debian-specific configuration to /usr/share
+  * Use the new upstream logrotate configuration
+  * Remove the gpg key in the case where the script hasn't run yet
+  * Update the cron configuration based on the new upstream crontab
+  * Prevent files from being removed when the script -r option is used
+  * Handle filenames starting with a '-' in the postrm script
+
+ -- Paul Wise <pabs@debian.org>  Tue, 12 May 2009 01:28:21 +0800
+
+clamav-unofficial-sigs (2.8-1) unstable; urgency=low
+
+  * New upstream version
+    - Generates its own purge.txt, use that instead of generating our own
+    - Includes our manpage, use that instead of our own
+  * Let the upstream script import the gpg key on first run
+  * Revert back to the default upstream reload_opt="clamdscan --reload"
+    - Depend on clamav-daemon 0.94.dfsg.1 or later for that
+    - Provide a Debian-specific option for those who want to restart
+
+ -- Paul Wise <pabs@debian.org>  Sat, 02 May 2009 10:05:52 +0800
+
+clamav-unofficial-sigs (2.7.3-2) unstable; urgency=low
+
+  * Update manual page with some changes from upstream
+  * Silence non-error output from the cron job
+
+ -- Paul Wise <pabs@debian.org>  Wed, 29 Apr 2009 00:27:09 +0800
+
+clamav-unofficial-sigs (2.7.3-1) unstable; urgency=low
+
+  * Initial release (Closes: #524565)
+
+ -- Paul Wise <pabs@debian.org>  Sun, 26 Apr 2009 13:40:08 +0800

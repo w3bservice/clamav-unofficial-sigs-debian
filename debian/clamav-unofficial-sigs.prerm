@@ -1,0 +1,44 @@
+#!/bin/sh
+set -e
+
+purge=/var/lib/clamav-unofficial-sigs/purge.txt
+
+# Prepare a list of filenames to remove on purge
+# We need the upstream config so this is done in prerm remove
+if [ "$1" = remove ] ; then
+
+    config_files="/etc/clamav-unofficial-sigs/master.conf
+                  /etc/clamav-unofficial-sigs/os.conf
+                  /etc/clamav-unofficial-sigs/user.conf"
+
+    for config_file in $config_files ; do
+        if [ -s $config_file ] ; then
+            . $config_file
+        fi
+    done
+
+
+    libdir=/var/lib/clamav-unofficial-sigs
+    if [ "x$config_dir" = x ] ; then config_dir=$libdir/configs ; fi
+    if [ "x$gpg_dir" = x ] ; then gpg_dir=/var/cache/clamav-unofficial-sigs/gpg-key ; fi
+    if [ "x$log_file_path" = x ] ; then log_file_path=/var/log ; fi
+    if [ "x$log_file_name" = x ] ; then log_file_name=clamav-unofficial-sigs.log ; fi
+
+    # Purge the purge file self
+    echo $purge > $purge
+    echo "$work_dir_configs/purge.txt" >> $purge
+
+    # Purge the cached gpg key
+    echo "$gpg_dir/publickey.gpg" >> $purge
+
+    # Purge all logfiles
+    echo "$log_file_path/$log_file_name"* >> $purge
+
+    if [ -s "$config_dir/purge.txt" ] ; then
+        cat "$config_dir/purge.txt" >> $purge
+    fi
+fi
+
+#DEBHELPER#
+
+exit 0

@@ -1,0 +1,11 @@
+usr/sbin
+etc/clamav-unofficial-sigs
+var/cache/clamav-unofficial-sigs/dbs-add
+var/cache/clamav-unofficial-sigs/dbs-lmd
+var/cache/clamav-unofficial-sigs/dbs-mbl
+var/cache/clamav-unofficial-sigs/dbs-si
+var/cache/clamav-unofficial-sigs/dbs-ss
+var/cache/clamav-unofficial-sigs/dbs-yara
+var/cache/clamav-unofficial-sigs/gpg-key
+var/log/clamav-unofficial-sigs
+var/lib/clamav-unofficial-sigs

@@ -1,0 +1,53 @@
+clamav-unofficial-sigs (5.1.0-1) unstable; urgency=medium
+
+ Clamav-unofficial-sigs maintenance was picked up by extremeshok,
+ who contributed quite some cleanup to the scripts.
+
+ The configuration file structure has changed, I adapted the
+ changes to upstream. The old /etc/clamav-unofficial-sigs.conf.d
+ directory is obsolete. Also shell code isn't evaluated by
+ /usr/sbin/clamav-unofficial-sigs anymore, and thus one can not
+ put more complex shell code into the configuration files anymore.
+
+ There are now three configuration files in
+ /etc/clamav-unofficial-sigs/, a 'master.conf' for default settings
+ from upstream, an 'os.conf' for distribution specific defaults and
+ a 'user.conf' for local changes.
+
+ Changing the log file location does not work well, so log files
+ are moved to /var/log/clamav-unofficial-sigs/ on package upgrade.
+
+ The location of the single database storage has changed to match
+ the ones upstream, no need to alter the configuration here.
+
+ clamav-unofficial-sigs now reloads ClamAV signatures by default.
+
+ -- Stefan Schlesinger <sts@ono.at>  Wed, 11 Apr 2016 13:39:48 +0000
+
+clamav-unofficial-sigs (3.7.1-2) unstable; urgency=low
+
+  This release reverts back to the upstream default of not checking
+  if the clamav daemon is running. This allows the script to run
+  on systems that don't run the daemon. If you want to re-enable the
+  watchdog functionality, copy these two lines to your config file:
+
+  clamd_socket="/var/run/clamav/clamd.ctl"
+  clamd_pid="/var/run/clamav/clamd.pid"
+
+ -- Paul Wise <pabs@debian.org>  Tue, 29 May 2012 20:19:43 +0800
+
+clamav-unofficial-sigs (3.5.4-1) unstable; urgency=low
+
+  This version removes all the medium and high risk databases from
+  the default configuration, if you would like to keep using them
+  then please edit your configuration file as directed in it.
+
+  This version switches to running the script as the clamav user
+  instead of root to enhance security. If you wish to further
+  increase security, please see README.Debian for a technique
+  for running the script as a user separate to clamav.
+
+  As a consequence of running the script as the clamav user,
+  the package will no longer start clamav when it is not running.
+
+ -- Paul Wise <pabs@debian.org>  Fri, 19 Jun 2009 15:20:24 +0800

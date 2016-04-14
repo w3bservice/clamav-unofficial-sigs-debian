@@ -1,0 +1,84 @@
+/----------------------------------------------------------------------------
+| Default settings altered
+
+Some of the default settings have been altered, see here for more info:
+
+/etc/clamav-unofficial-sigs/os.conf
+
+/----------------------------------------------------------------------------
+| Overriding default config
+
+To override the default configuration place your changes in
+/etc/clamav-unofficial-sigs/user.conf. Don't alter the master.conf or
+os.conf as these are reserved for upstream and distribution wide
+defaults.
+
+/----------------------------------------------------------------------------
+| Enhanced security
+
+You might like to run the clamav-unofficial-sigs script as a non-root,
+non-clamav user for extra security. To get this working, please follow
+the following steps.
+
+First create a new system user and group 'clamav-unofficial-sigs' and
+add the new user to the ClamAV group.
+
+# adduser --system --no-create-home --disabled-password --disabled-login \
+          --shell /bin/false --group --home /nonexistent clamav-unofficial-sigs
+# adduser clamav-unofficial-sigs clamav
+
+Direct the mail for the new system user to root:
+
+# echo clamav-unofficial-sigs: root >> /etc/aliases
+# newaliases
+
+Change the owner/group on the log files and data files to this user.
+
+# chown -R clamav-unofficial-sigs:clamav /var/cache/clamav-unofficial-sigs
+# chown -R clamav-unofficial-sigs:clamav /var/lib/clamav-unofficial-sigs
+# chown -R clamav-unofficial-sigs:clamav /var/log/clamav-unofficial-sigs.log*
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-add
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-lmd
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-mbl
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-si
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-ss
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/cache/clamav-unofficial-sigs/dbs-yara
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0700 /var/cache/clamav-unofficial-sigs/gpg-key
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/lib/clamav-unofficial-sigs
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/lib/clamav-unofficial-sigs/purge.txt
+# dpkg-statoverride --add --force --update clamav-unofficial-sigs clamav 0755 /var/log/clamav-unofficial-sigs
+
+
+Change the owner (but not the group) of the custom data files in the clamav
+database directory to this user.
+
+# chown clamav-unofficial-sigs:clamav /var/lib/clamav/*.hdb* /var/lib/clamav/*.ndb*
+
+Change the permissions on the clamav database directory to set the
+sticky bit and group write permission bit. If you installed clamav with
+your package manager you may need to use a command other than chmod to
+make this more permanent. On Debian, please use dpkg-statoverride.
+
+# dpkg-statoverride --add --force --update clamav clamav 1775 /var/lib/clamav
+
+Edit the cron file and logrotate configuration to use this user.
+
+# sed -i -r -e 's/ (root|clamav) / clamav-unofficial-sigs /' /etc/cron.d/clamav-unofficial-sigs /etc/logrotate.d/clamav-unofficial-sigs
+
+This setup prevents the script from running inappropriate commands as
+root and also prevents the script from modifying the official ClamAV
+signature databases.
+
+The package is not setup like this by default because packages should not
+modify the permissions of other packages files and directories.
+
+/----------------------------------------------------------------------------
+| Running as root
+
+If for some reason you want to run the clamav-unofficial-sigs script as root,
+you will need to tell the script to chown the database files like this:
+
+# echo clam_user=clamav >> /etc/clamav-unofficial-sigs.conf
+# echo clam_group=clamav >> /etc/clamav-unofficial-sigs.conf
+# sed -i -e '/^[^#]/s/clamav/root/g' /etc/cron.d/clamav-unofficial-sigs

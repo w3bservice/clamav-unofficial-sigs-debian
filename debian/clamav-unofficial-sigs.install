@@ -1,0 +1,7 @@
+#!/usr/bin/dh-exec
+
+config/master.conf => etc/clamav-unofficial-sigs/master.conf
+config/user.conf => etc/clamav-unofficial-sigs/user.conf
+debian/debian.conf => etc/clamav-unofficial-sigs/os.conf
+debian/publickey.gpg => usr/share/clamav-unofficial-sigs/publickey.gpg
+clamav-unofficial-sigs.sh => usr/sbin/clamav-unofficial-sigs

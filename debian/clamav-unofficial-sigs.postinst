@@ -1,0 +1,87 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = configure ] ; then
+
+    config_files="/etc/clamav-unofficial-sigs/master.conf
+                  /etc/clamav-unofficial-sigs/os.conf
+                  /etc/clamav-unofficial-sigs/user.conf"
+
+    for config_file in $config_files ; do
+        if [ -s $config_file ] ; then
+            . $config_file
+        fi
+    done
+
+    if [ "x$gpg_dir" = x ] ; then
+        gpg_dir=/var/cache/clamav-unofficial-sigs/gpg-key
+    fi
+
+    if [ ! -s "$work_dir/$gpg_dir/publickey.gpg" ] ; then
+        cp /usr/share/clamav-unofficial-sigs/publickey.gpg "$work_dir/$gpg_dir/publickey.gpg"
+    fi
+
+    # Detect which user the script will run from
+    # Will be 'clamav' unless the user customised the cron script
+    user="$(grep '^[^#]\+$' /etc/cron.d/clamav-unofficial-sigs | cut -d ' '  -f 6)"
+
+    if [ "x$user" != x -a "x$user" != xroot ] ; then
+        group="$(id -ng "$user")"
+
+        echo "Adjusting file ownership to match user from cron.d: $user/$group"
+
+        # Ensure the directories are all writable for the cron user
+        for dir in "$sansesecurity_dir" "$securiteinfo_dir" "$linuxmalwaredetect_dir" \
+            "$malwarepatrol_dir" "$yararules_dir" "$add_dir"; do
+            dir="$work_dir/$dir"
+            if ! dpkg-statoverride --list "$dir" > /dev/null 2>&1 ; then
+                dpkg-statoverride --update --add "$user" "$group" 0755 "$dir"
+                chown -f "$user:$group" "$dir"/* > /dev/null 2>&1 || true
+            fi
+        done
+
+        if ! dpkg-statoverride --list "$work_dir/$gpg_dir" > /dev/null 2>&1 ; then
+            dpkg-statoverride --update --add "$user" "$group" 0700 "$work_dir/$gpg_dir"
+            chown -f "$user:$group" "$work_dir/$gpg_dir"/* > /dev/null 2>&1 || true
+        fi
+
+        # Create the log file and make it writable for the cron user
+        if [ ! -e "$log_file_path/$log_file_name" ] ; then
+            touch "$log_file_path/$log_file_name"
+            chown "$user:$group" "$log_file_path/$log_file_name"
+        fi
+
+        # Make all the files written by the script writable for the cron user on upgrade
+        if [ "x$2" != x ] && dpkg --compare-versions "$2" lt 3.5.4 ; then
+            for file in `cat "$work_dir_configs/purge.txt" 2>/dev/null` ; do
+                chown -f "$user:$group" "$file" > /dev/null 2>&1 || true
+            done
+        fi
+    fi
+fi
+
+
+if [ "$1" = upgrade ] ; then
+    if dpkg-maintscript-helper supports rm_conffile 2>/dev/null; then
+        dpkg-maintscript-helper rm_conffile /etc/clamav-unofficial-sigs.conf -- "$@"
+
+        # Location of configurations has changed since 5.0.0, warn
+        # users since we cannot migrate the free form configuration
+        # automatically!
+        if [ -d /etc/clamav-unofficial-sigs.d ] ; then
+            echo -e "\e[101m ATTENTION! Obsolete configuration detected, which will be ignored!"
+            echo -e "\e[101m Please migrate your configuration from /etc/clamav-unofficial-sigs.conf.d to the new structure in /etc/clamav-unofficial-sigs/user.conf"
+            echo -e "\e[101m Please remove the directory afterwards!"
+        fi
+
+
+        if [ -f /var/log/clamav-unofficial-sigs.log ] ; then
+            echo 'Migrating old logfiles into new log directory /var/log/clamav-unofficial-sigs'
+            [ -d /var/log/clamav-unofficial-sigs ] || mkdir -p /var/log/clamav-unofficial-sigs
+            mv /var/log/clamav-unofficial-sigs.log /var/log/clamav-unofficial-sigs.log* /var/log/clamav-unofficial-sigs/
+        fi
+    fi
+fi
+
+exit 0
+
